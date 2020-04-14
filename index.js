@@ -69,16 +69,16 @@ fastify.get("/auth", async (req, res) => {
 
 fastify.get("/verify", (req, res) => {
     let token = req.query.token;
+    let submitTime = req.query.submitTime || 0; // converted timestamp in spreadsheet
 
     jwt.verify(
         token,
         keys.keys.public,
         { algorithms: ["RS256"] },
         (err, decoded) => {
-            if (err)
-                res.send(400);
-            else
-                res.send(decoded);
+            if (err) res.send(400);
+            decoded.valid = submitTime <= decoded.iat + 600 // 10 minute token invalidation
+            res.send(decoded);
         }
     );
 
