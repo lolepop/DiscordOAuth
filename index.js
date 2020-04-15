@@ -1,3 +1,5 @@
+"use strict";
+
 const fastify = require("fastify")();
 const axios = require("axios");
 const querystring = require("querystring");
@@ -12,7 +14,7 @@ fastify.register(require("fastify-rate-limit"), {
     max: 1,
     timeWindow: "5 seconds",
     whitelist: req => {
-        return req.headers["x-whitelist"] === process.env.CLIENT_SECRET;
+        return req.headers["x-whitelisted"] === process.env.CLIENT_SECRET;
     }
 })
 
@@ -21,11 +23,11 @@ fastify.get("/", (req, res) => {
 });
 
 fastify.get("/auth", async (req, res) => {
-    let code = req.query.code;
+    const code = req.query.code;
     if (!code)
         res.send(400);
     
-    var data = {
+    const data = {
         client_id: process.env.CLIENT_ID,
         client_secret: process.env.CLIENT_SECRET,
         grant_type: "authorization_code",
@@ -36,7 +38,7 @@ fastify.get("/auth", async (req, res) => {
 
     try
     {
-        let token = await axios({
+        const token = await axios({
             method: "POST",
             url: api.OAuthToken,
             headers: {
@@ -54,7 +56,7 @@ fastify.get("/auth", async (req, res) => {
         });
         userInfo = userInfo.data;
 
-        let authToken = await jwt.sign(
+        const authToken = await jwt.sign(
             {
                 id: userInfo.id,
                 name: `${userInfo.username}#${userInfo.discriminator}`
@@ -63,21 +65,18 @@ fastify.get("/auth", async (req, res) => {
             { algorithm: "RS256" }
         );
         
-        console.log(authToken);
-
         res.redirect(process.env.FORMSURL + authToken);
     }
     catch (e)
     {
-        console.error(e);
         res.send(400);
     }
     
 });
 
 fastify.get("/verify", (req, res) => {
-    let token = req.query.token;
-    let submitTime = req.query.submitTime || 0; // converted timestamp in spreadsheet
+    const token = req.query.token;
+    const submitTime = req.query.submitTime || 0; // converted timestamp in spreadsheet
 
     jwt.verify(
         token,

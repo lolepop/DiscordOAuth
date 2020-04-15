@@ -1,6 +1,8 @@
-let discordBase = "https://discordapp.com/api/";
+"use strict";
 
-let endpoints = {
+const discordBase = "https://discordapp.com/api/";
+
+const endpoints = {
     OAuthToken: "oauth2/token",
     getCurrentUser: "users/@me"
 }

@@ -1,3 +1,5 @@
+"use strict";
+
 const fs = require("fs");
 const path = require("path");
 
@@ -15,7 +17,7 @@ class JWTKeyPair
 {
     constructor() // its big brain time
     {
-        return (async _ => {
+        return (async () => {
             [this.private, this.public] = await Promise.all([getPrivateKey(), getPublicKey()]);
             return this;
         })();
@@ -24,6 +26,6 @@ class JWTKeyPair
 }
 
 // var keys = (async _ => {return await new JWTKeyPair()})();
-var keys = null;
+let keys = null;
 
 module.exports = { keys, JWTKeyPair };
