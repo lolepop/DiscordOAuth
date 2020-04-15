@@ -8,6 +8,14 @@ require("dotenv").config();
 const keys = require("./keys");
 const api = require("./api");
 
+fastify.register(require("fastify-rate-limit"), {
+    max: 1,
+    timeWindow: "5 seconds",
+    whitelist: req => {
+        return req.headers["x-whitelist"] === process.env.CLIENT_SECRET;
+    }
+})
+
 fastify.get("/", (req, res) => {
     res.redirect(process.env.oauthurl);
 });
